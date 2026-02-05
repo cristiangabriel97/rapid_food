@@ -122,7 +122,7 @@ export default function AdminInventory() {
     <div className="space-y-10">
       <div>
         <h2 className="text-xl font-semibold">Administrador</h2>
-        <p className="text-sm text-zinc-400">Inventario • Categorías • Platos</p>
+        <p className="text-sm text-zinc-400">Ingresar productos</p>
       </div>
 
       {/* Categorías */}
@@ -196,10 +196,10 @@ export default function AdminInventory() {
 
       {/* Platos */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold">Platos</h3>
+        <h3 className="text-lg font-semibold">Producto</h3>
 
         <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 shadow-xl">
-          <p className="text-sm font-semibold">Nuevo plato</p>
+          <p className="text-sm font-semibold">Nuevo ingreso</p>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <input
@@ -255,7 +255,7 @@ export default function AdminInventory() {
               className="flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-orange-400 disabled:opacity-60 sm:col-span-2"
             >
               {saving ? <Spinner /> : <Save className="h-4 w-4" />}
-              Guardar plato
+              Guardar
             </button>
           </div>
         </div>
@@ -267,7 +267,7 @@ export default function AdminInventory() {
               <Skeleton key={i} className="h-44 w-full" />
             ))
           ) : platos.length === 0 ? (
-            <p className="text-sm text-zinc-400">No hay platos registrados.</p>
+            <p className="text-sm text-zinc-400">No hay registros.</p>
           ) : (
             platos.map((p) => (
               <div
