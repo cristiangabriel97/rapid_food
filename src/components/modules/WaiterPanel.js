@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -150,8 +149,8 @@ export default function WaiterPanel({ meseroId }) {
       {/* Menú */}
       <div className="lg:col-span-2">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold">Menú</h2>
-          <p className="text-sm text-zinc-400">
+          <h2 className="text-xl font-semibold text-zinc-900">Menú</h2>
+          <p className="text-sm text-zinc-500">
             Selecciona una categoría y agrega productos al pedido.
           </p>
         </div>
@@ -169,10 +168,10 @@ export default function WaiterPanel({ meseroId }) {
               <button
                 key={c.id}
                 onClick={() => setActiveCategoria(c.id)}
-                className={`whitespace-nowrap rounded-2xl px-4 py-2 text-sm transition ${
+                className={`whitespace-nowrap rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                   activeCategoria === c.id
-                    ? "bg-orange-500 text-zinc-950 shadow-lg shadow-orange-500/20"
-                    : "border border-zinc-800 bg-zinc-900/30 text-zinc-200 hover:bg-zinc-900"
+                    ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+                    : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
                 }`}
               >
                 {c.nombre}
@@ -191,14 +190,15 @@ export default function WaiterPanel({ meseroId }) {
                 <button
                   key={p.id}
                   onClick={() => addToCart(p)}
-                  className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 text-left shadow-sm transition hover:bg-zinc-900"
+                  className="rounded-2xl border border-zinc-200 bg-white p-4 text-left shadow-sm transition hover:border-orange-300 hover:shadow-md"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-semibold">{p.nombre}</p>
-                      <p className="mt-1 text-xs text-zinc-400">{p.descripcion}</p>
+                      <p className="font-semibold text-zinc-900">{p.nombre}</p>
+                      <p className="mt-1 text-xs text-zinc-500">{p.descripcion}</p>
                     </div>
-                    <div className="rounded-xl bg-zinc-950 px-3 py-1 text-sm font-semibold text-orange-400">
+
+                    <div className="rounded-xl bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-600">
                       ${Number(p.precio).toFixed(2)}
                     </div>
                   </div>
@@ -208,32 +208,32 @@ export default function WaiterPanel({ meseroId }) {
       </div>
 
       {/* Carrito */}
-      <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-xl">
-        <h3 className="text-lg font-semibold">Pedido</h3>
-        <p className="text-xs text-zinc-400">Carrito del mesero</p>
+      <div className="rounded-3xl border border-zinc-200 bg-white p-4 shadow-lg">
+        <h3 className="text-lg font-semibold text-zinc-900">Gestionar pedido</h3>
+        <p className="text-xs text-zinc-500">Seleciona los items disponibles.</p>
 
         <div className="mt-4 space-y-3">
           {cart.length === 0 ? (
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 text-sm text-zinc-400">
-              No hay items agregados.
+            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-500">
+              No hay pedidos.
             </div>
           ) : (
             cart.map((it, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-3"
+                className="rounded-2xl border border-zinc-200 bg-zinc-50 p-3"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-semibold">{it.nombre}</p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-sm font-semibold text-zinc-900">{it.nombre}</p>
+                    <p className="text-xs text-zinc-500">
                       ${Number(it.precio).toFixed(2)} c/u
                     </p>
                   </div>
 
                   <button
                     onClick={() => removeItem(idx)}
-                    className="rounded-xl border border-zinc-800 bg-zinc-950 p-2 text-zinc-300 hover:bg-zinc-900"
+                    className="rounded-xl border border-zinc-200 bg-white p-2 text-zinc-700 hover:bg-zinc-100"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -244,37 +244,40 @@ export default function WaiterPanel({ meseroId }) {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQty(idx, -1)}
-                      className="rounded-xl border border-zinc-800 bg-zinc-950 p-2 hover:bg-zinc-900"
+                      className="rounded-xl border border-zinc-200 bg-white p-2 text-zinc-800 hover:bg-zinc-100"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
-                    <span className="min-w-8 text-center text-sm font-semibold">
+
+                    <span className="min-w-8 text-center text-sm font-semibold text-zinc-900">
                       {it.cantidad}
                     </span>
+
                     <button
                       onClick={() => updateQty(idx, 1)}
-                      className="rounded-xl border border-zinc-800 bg-zinc-950 p-2 hover:bg-zinc-900"
+                      className="rounded-xl border border-zinc-200 bg-white p-2 text-zinc-800 hover:bg-zinc-100"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <div className="text-sm font-semibold text-orange-400">
+                  <div className="text-sm font-semibold text-orange-600">
                     ${(it.precio * it.cantidad).toFixed(2)}
                   </div>
                 </div>
 
                 {/* Observaciones */}
                 <div className="mt-3">
-                  <div className="mb-1 flex items-center gap-2 text-xs text-zinc-400">
+                  <div className="mb-1 flex items-center gap-2 text-xs text-zinc-500">
                     <NotebookPen className="h-4 w-4" />
                     Observaciones
                   </div>
+
                   <input
                     value={it.observaciones}
                     onChange={(e) => updateObs(idx, e.target.value)}
                     placeholder="Ej: sin cebolla, sin hielo..."
-                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-orange-500"
+                    className="w-full rounded-2xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                   />
                 </div>
               </div>
@@ -284,24 +287,26 @@ export default function WaiterPanel({ meseroId }) {
 
         {/* Tipo Servicio */}
         <div className="mt-5">
-          <p className="mb-2 text-sm font-semibold">Tipo de servicio</p>
+          <p className="mb-2 text-sm font-semibold text-zinc-900">Tipo de servicio</p>
+
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setTipoServicio("local")}
               className={`rounded-2xl px-3 py-3 text-sm font-semibold transition ${
                 tipoServicio === "local"
-                  ? "bg-orange-500 text-zinc-950"
-                  : "border border-zinc-800 bg-zinc-900/30 text-zinc-200 hover:bg-zinc-900"
+                  ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+                  : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
               }`}
             >
               Para comer aquí
             </button>
+
             <button
               onClick={() => setTipoServicio("llevar")}
               className={`rounded-2xl px-3 py-3 text-sm font-semibold transition ${
                 tipoServicio === "llevar"
-                  ? "bg-orange-500 text-zinc-950"
-                  : "border border-zinc-800 bg-zinc-900/30 text-zinc-200 hover:bg-zinc-900"
+                  ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+                  : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
               }`}
             >
               Para llevar
@@ -311,9 +316,9 @@ export default function WaiterPanel({ meseroId }) {
 
         {/* Total + Send */}
         <div className="mt-6 space-y-3">
-          <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/30 px-4 py-3">
-            <span className="text-sm text-zinc-300">Total</span>
-            <span className="text-lg font-semibold text-orange-400">
+          <div className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3">
+            <span className="text-sm text-zinc-600">Total</span>
+            <span className="text-lg font-semibold text-orange-600">
               ${total.toFixed(2)}
             </span>
           </div>
@@ -321,7 +326,7 @@ export default function WaiterPanel({ meseroId }) {
           <button
             disabled={sending}
             onClick={sendOrder}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-orange-500/20 hover:bg-orange-400 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600 disabled:opacity-60"
           >
             {sending ? <Spinner /> : <Send className="h-4 w-4" />}
             Enviar a Caja

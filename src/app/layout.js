@@ -1,23 +1,16 @@
 import "./globals.css";
-import { Toaster } from "sonner";
+import { Toaster } from "sonner"; // <--- ESTA LÍNEA ES LA QUE FALTA
 
 export const metadata = {
-  title: "FastFood POS",
-  description: "Sistema integral de gestión para restaurante",
+  title: "FastFood",
+  description: "Sistema de gestion de comidas rápidas",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className="min-h-screen font-sans">
-        <Toaster
-          richColors
-          position="top-center"
-          toastOptions={{
-            className:
-              "rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-50 shadow-xl",
-          }}
-        />
+      <body className="min-h-screen font-sans bg-zinc-50 text-zinc-900 antialiased">
+        <Toaster richColors position="top-center" />
         {children}
       </body>
     </html>

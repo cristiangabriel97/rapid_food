@@ -1,10 +1,10 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Skeleton from "@/components/ui/Skeleton";
 import { toast } from "sonner";
+import { TrendingUp, Receipt, Layers3 } from "lucide-react";
 
 export default function SalesReport() {
   const [loading, setLoading] = useState(true);
@@ -70,47 +70,107 @@ export default function SalesReport() {
   }, [pedidos, platos, categorias]);
 
   return (
-    <div>
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold">Reportes</h2>
-        <p className="text-sm text-zinc-400">
-          Ventas de hoy (solo pedidos pagados)
-        </p>
+    <div className="min-h-[calc(100vh-120px)] rounded-3xl bg-zinc-50 p-6">
+      {/* Header */}
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-900">
+            Reportes
+          </h2>
+          <p className="text-sm text-zinc-500">
+            Ventas de hoy (solo pedidos pagados)
+          </p>
+        </div>
+
+        <button
+          onClick={load}
+          className="rounded-2xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-100"
+        >
+          Actualizar
+        </button>
       </div>
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-56 w-full sm:col-span-2" />
+          <Skeleton className="h-32 w-full rounded-3xl" />
+          <Skeleton className="h-32 w-full rounded-3xl" />
+          <Skeleton className="h-64 w-full rounded-3xl sm:col-span-2" />
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6 shadow-xl">
-            <p className="text-sm text-zinc-400">Total recaudado hoy</p>
-            <p className="mt-2 text-3xl font-semibold text-orange-400">
+          {/* Total */}
+          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-zinc-500">
+                Total recaudado hoy
+              </p>
+
+              <div className="rounded-2xl bg-orange-50 p-2 text-orange-600">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+            </div>
+
+            <p className="mt-3 text-3xl font-bold text-zinc-900">
               ${totalHoy.toFixed(2)}
+            </p>
+
+            <p className="mt-1 text-xs text-zinc-500">
+              Suma de pedidos marcados como pagados.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6 shadow-xl">
-            <p className="text-sm text-zinc-400">Número de órdenes</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-100">{numOrdenes}</p>
+          {/* Órdenes */}
+          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-zinc-500">
+                Número de órdenes
+              </p>
+
+              <div className="rounded-2xl bg-green-50 p-2 text-green-700">
+                <Receipt className="h-5 w-5" />
+              </div>
+            </div>
+
+            <p className="mt-3 text-3xl font-bold text-zinc-900">{numOrdenes}</p>
+
+            <p className="mt-1 text-xs text-zinc-500">
+              Cantidad total de pedidos pagados hoy.
+            </p>
           </div>
 
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6 shadow-xl sm:col-span-2">
-            <p className="text-sm font-semibold">Ventas por categoría</p>
-            <div className="mt-4 space-y-2">
+          {/* Ventas por categoría */}
+          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:col-span-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-zinc-900">
+                  Ventas por categoría
+                </p>
+                <p className="text-sm text-zinc-500">
+                  Ordenado de mayor a menor
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-zinc-100 p-2 text-zinc-700">
+                <Layers3 className="h-5 w-5" />
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-2">
               {ventasPorCategoria.length === 0 ? (
-                <p className="text-sm text-zinc-400">No hay ventas hoy.</p>
+                <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
+                  No hay ventas hoy.
+                </div>
               ) : (
                 ventasPorCategoria.map(([cat, val]) => (
                   <div
                     key={cat}
-                    className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/30 px-4 py-3"
+                    className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3"
                   >
-                    <span className="text-sm text-zinc-200">{cat}</span>
-                    <span className="text-sm font-semibold text-orange-400">
+                    <span className="text-sm font-semibold text-zinc-800">
+                      {cat}
+                    </span>
+
+                    <span className="rounded-xl bg-orange-50 px-3 py-1 text-sm font-bold text-orange-700">
                       ${val.toFixed(2)}
                     </span>
                   </div>

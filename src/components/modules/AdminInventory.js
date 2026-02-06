@@ -1,12 +1,20 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import Spinner from "@/components/ui/Spinner";
 import Skeleton from "@/components/ui/Skeleton";
-import { Plus, Save, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Save,
+  Trash2,
+  Package,
+  Tags,
+  Search,
+  Filter,
+} from "lucide-react";
 
 export default function AdminInventory() {
   const [categorias, setCategorias] = useState([]);
@@ -25,10 +33,18 @@ export default function AdminInventory() {
 
   const [saving, setSaving] = useState(false);
 
+  // extras para UI moderna
+  const [search, setSearch] = useState("");
+  const [catFilter, setCatFilter] = useState("");
+
   async function load() {
     setLoading(true);
 
-    const { data: cats } = await supabase.from("categorias").select("*").order("nombre");
+    const { data: cats } = await supabase
+      .from("categorias")
+      .select("*")
+      .order("nombre");
+
     const { data: items } = await supabase.from("platos").select("*").order("nombre");
 
     setCategorias(cats ?? []);
@@ -92,7 +108,7 @@ export default function AdminInventory() {
       return;
     }
 
-    toast.success("Plato creado");
+    toast.success("Producto creado");
     setNewPlato({
       nombre: "",
       descripcion: "",
@@ -114,43 +130,82 @@ export default function AdminInventory() {
       toast.error("No se pudo eliminar", { description: error.message });
       return;
     }
-    toast.success("Plato eliminado");
+    toast.success("Producto eliminado");
     load();
   }
 
+  const platosFiltrados = useMemo(() => {
+    const s = search.trim().toLowerCase();
+
+    return platos.filter((p) => {
+      const okSearch =
+        !s ||
+        String(p.nombre || "").toLowerCase().includes(s) ||
+        String(p.descripcion || "").toLowerCase().includes(s);
+
+      const okCat = !catFilter || String(p.categoria_id) === String(catFilter);
+
+      return okSearch && okCat;
+    });
+  }, [platos, search, catFilter]);
+
   return (
-    <div className="space-y-10">
-      <div>
-        <h2 className="text-xl font-semibold">Administrador</h2>
-        <p className="text-sm text-zinc-400">Ingresar productos</p>
+    <div className="min-h-[calc(100vh-120px)] rounded-3xl bg-zinc-50 p-6">
+      {/* Header */}
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-900">
+            Panel de administración. 
+          </h2>
+          <p className="text-sm text-zinc-500">
+            Categorías y productos del menú.
+          </p>
+        </div>
+
+        <button
+          onClick={load}
+          className="rounded-2xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-100"
+        >
+          Actualizar
+        </button>
       </div>
 
-      {/* Categorías */}
+      {/* CATEGORÍAS */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold">Categorías</h3>
+        <div className="flex items-center gap-2">
+          <div className="rounded-2xl bg-orange-50 p-2 text-orange-700">
+            <Tags className="h-5 w-5" />
+          </div>
+          <h3 className="text-lg font-semibold text-zinc-900">Categorías</h3>
+        </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 shadow-xl">
-            <p className="text-sm font-semibold">Nueva categoría</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Crear categoría */}
+          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold text-zinc-900">Nueva categoría</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              Ej: Comida, Bebidas, Combos...
+            </p>
 
-            <div className="mt-3 space-y-3">
+            <div className="mt-4 space-y-3">
               <input
                 value={newCat.nombre}
                 onChange={(e) => setNewCat((p) => ({ ...p, nombre: e.target.value }))}
-                placeholder="Nombre (Ej: Hamburguesas)"
-                className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-orange-500"
+                placeholder="Nombre de categoría"
+                className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-orange-500"
               />
+
               <input
                 value={newCat.icono}
                 onChange={(e) => setNewCat((p) => ({ ...p, icono: e.target.value }))}
-                placeholder="Icono (Ej: burger)"
-                className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-orange-500"
+                placeholder="Icono (opcional) ej: burger"
+                className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-orange-500"
               />
 
               <button
                 disabled={saving}
                 onClick={createCategoria}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-orange-400 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-500 disabled:opacity-60"
               >
                 {saving ? <Spinner /> : <Plus className="h-4 w-4" />}
                 Crear categoría
@@ -158,33 +213,43 @@ export default function AdminInventory() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 shadow-xl">
-            <p className="text-sm font-semibold">Listado</p>
+          {/* Listado categorías */}
+          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold text-zinc-900">Listado de categorías</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              Categorpias disponibles
+            </p>
 
-            <div className="mt-3 space-y-2">
+            <div className="mt-4 space-y-2">
               {loading ? (
                 <>
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full rounded-2xl" />
+                  <Skeleton className="h-12 w-full rounded-2xl" />
+                  <Skeleton className="h-12 w-full rounded-2xl" />
                 </>
               ) : categorias.length === 0 ? (
-                <p className="text-sm text-zinc-400">No hay categorías.</p>
+                <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
+                  No hay categorías.
+                </div>
               ) : (
                 categorias.map((c) => (
                   <div
                     key={c.id}
-                    className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/30 px-4 py-3"
+                    className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3"
                   >
                     <div>
-                      <p className="text-sm font-semibold">{c.nombre}</p>
+                      <p className="text-sm font-semibold text-zinc-900">
+                        {c.nombre}
+                      </p>
                       <p className="text-xs text-zinc-500">{c.icono || "—"}</p>
                     </div>
+
                     <button
                       onClick={() => deleteCategoria(c.id)}
-                      className="rounded-xl border border-zinc-800 bg-zinc-950 p-2 hover:bg-zinc-900"
+                      className="rounded-xl border border-zinc-200 bg-white p-2 text-zinc-700 shadow-sm transition hover:bg-zinc-100"
+                      title="Eliminar"
                     >
-                      <Trash2 className="h-4 w-4 text-zinc-300" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 ))
@@ -194,33 +259,44 @@ export default function AdminInventory() {
         </div>
       </section>
 
-      {/* Platos */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold">Producto</h3>
+      {/* PRODUCTOS */}
+      <section className="mt-10 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="rounded-2xl bg-green-50 p-2 text-green-700">
+            <Package className="h-5 w-5" />
+          </div>
+          <h3 className="text-lg font-semibold text-zinc-900">Productos</h3>
+        </div>
 
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 shadow-xl">
-          <p className="text-sm font-semibold">Nuevo ingreso</p>
+        {/* Form nuevo plato */}
+        <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-semibold text-zinc-900">Nuevo ingreso</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            Registra un nuevo producto del menú
+          </p>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <input
               value={newPlato.nombre}
               onChange={(e) => setNewPlato((p) => ({ ...p, nombre: e.target.value }))}
               placeholder="Nombre"
-              className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-orange-500"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-orange-500"
             />
+
             <input
               value={newPlato.precio}
               onChange={(e) => setNewPlato((p) => ({ ...p, precio: e.target.value }))}
               placeholder="Precio (Ej: 4.50)"
-              className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-orange-500"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-orange-500"
             />
+
             <input
               value={newPlato.descripcion}
               onChange={(e) =>
                 setNewPlato((p) => ({ ...p, descripcion: e.target.value }))
               }
               placeholder="Descripción"
-              className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-orange-500 sm:col-span-2"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-orange-500 sm:col-span-2"
             />
 
             <select
@@ -228,7 +304,7 @@ export default function AdminInventory() {
               onChange={(e) =>
                 setNewPlato((p) => ({ ...p, categoria_id: e.target.value }))
               }
-              className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm outline-none focus:border-orange-500"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none focus:border-orange-500"
             >
               <option value="">Selecciona categoría</option>
               {categorias.map((c) => (
@@ -238,7 +314,7 @@ export default function AdminInventory() {
               ))}
             </select>
 
-            <label className="flex items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/30 px-4 py-3 text-sm">
+            <label className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-700">
               <input
                 type="checkbox"
                 checked={newPlato.disponible}
@@ -252,11 +328,40 @@ export default function AdminInventory() {
             <button
               disabled={saving}
               onClick={createPlato}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-orange-400 disabled:opacity-60 sm:col-span-2"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-500 disabled:opacity-60 sm:col-span-2"
             >
               {saving ? <Spinner /> : <Save className="h-4 w-4" />}
-              Guardar
+              Guardar producto
             </button>
+          </div>
+        </div>
+
+        {/* Barra de búsqueda + filtro */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm sm:max-w-md">
+            <Search className="h-5 w-5 text-zinc-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar producto..."
+              className="w-full bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm">
+            <Filter className="h-5 w-5 text-zinc-400" />
+            <select
+              value={catFilter}
+              onChange={(e) => setCatFilter(e.target.value)}
+              className="bg-transparent text-sm text-zinc-900 outline-none"
+            >
+              <option value="">Todas las categorías</option>
+              {categorias.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -264,25 +369,32 @@ export default function AdminInventory() {
         <div className="grid gap-4 sm:grid-cols-2">
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-44 w-full" />
+              <Skeleton key={i} className="h-48 w-full rounded-3xl" />
             ))
-          ) : platos.length === 0 ? (
-            <p className="text-sm text-zinc-400">No hay registros.</p>
+          ) : platosFiltrados.length === 0 ? (
+            <div className="rounded-3xl border border-zinc-200 bg-white p-6 text-sm text-zinc-600 sm:col-span-2">
+              No hay productos registrados o no coinciden con la búsqueda.
+            </div>
           ) : (
-            platos.map((p) => (
+            platosFiltrados.map((p) => (
               <div
                 key={p.id}
-                className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 shadow-xl"
+                className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold">{p.nombre}</p>
-                    <p className="mt-1 text-xs text-zinc-400">{p.descripcion}</p>
+                    <p className="text-base font-semibold text-zinc-900">
+                      {p.nombre}
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-500">
+                      {p.descripcion || "Sin descripción"}
+                    </p>
                   </div>
 
                   <button
                     onClick={() => deletePlato(p.id)}
-                    className="rounded-xl border border-zinc-800 bg-zinc-950 p-2 hover:bg-zinc-900"
+                    className="rounded-xl border border-zinc-200 bg-white p-2 text-zinc-700 shadow-sm transition hover:bg-zinc-100"
+                    title="Eliminar producto"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -291,18 +403,38 @@ export default function AdminInventory() {
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <input
                     defaultValue={p.precio}
-                    onBlur={(e) => updatePlato(p.id, { precio: Number(e.target.value) })}
-                    className="rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm outline-none focus:border-orange-500"
+                    onBlur={(e) =>
+                      updatePlato(p.id, { precio: Number(e.target.value) })
+                    }
+                    className="rounded-2xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-orange-500"
                   />
 
-                  <label className="flex items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/30 px-3 py-2 text-sm">
+                  <label className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
                     <input
                       type="checkbox"
                       defaultChecked={p.disponible}
-                      onChange={(e) => updatePlato(p.id, { disponible: e.target.checked })}
+                      onChange={(e) =>
+                        updatePlato(p.id, { disponible: e.target.checked })
+                      }
                     />
                     Disponible
                   </label>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span
+                    className={`rounded-xl px-3 py-1 text-xs font-semibold ${
+                      p.disponible
+                        ? "bg-green-50 text-green-700"
+                        : "bg-zinc-100 text-zinc-600"
+                    }`}
+                  >
+                    {p.disponible ? "Disponible" : "No disponible"}
+                  </span>
+
+                  <span className="rounded-xl bg-orange-50 px-3 py-1 text-xs font-bold text-orange-700">
+                    ${Number(p.precio || 0).toFixed(2)}
+                  </span>
                 </div>
               </div>
             ))

@@ -67,18 +67,18 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/70 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <div>
-            <h1 className="text-lg font-semibold tracking-tight">FastFoodEC</h1>
+            <h1 className="text-lg font-semibold tracking-tight">FastFood</h1>
             <p className="text-xs text-zinc-400">{userEmail}</p>
           </div>
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-900"
+            className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-900 shadow-sm hover:bg-zinc-50"
           >
             <LogOut className="h-4 w-4" />
             Salir
@@ -95,7 +95,7 @@ export default function HomePage() {
       </main>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-900 bg-zinc-950/80 backdrop-blur">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200 bg-white/80 backdrop-blur">
         <div className="mx-auto grid max-w-6xl grid-cols-4 gap-1 px-3 py-2">
           <TabButton
             active={activeTab === "mesero"}
@@ -109,14 +109,14 @@ export default function HomePage() {
             onClick={() => setActiveTab("caja")}
             label="Caja"
             icon={<CreditCard className="h-5 w-5" />}
-            accent="green"
+            accent="orange"
           />
           <TabButton
             active={activeTab === "admin"}
             onClick={() => setActiveTab("admin")}
             label="Admin"
             icon={<Settings className="h-5 w-5" />}
-            accent="zinc"
+            accent="orange"
           />
           <TabButton
             active={activeTab === "reportes"}

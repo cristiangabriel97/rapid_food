@@ -1,11 +1,16 @@
 @import "tailwindcss";
 
-/* Si quieres usar @apply en un archivo CSS separado, 
-   necesitas referenciar la configuración base */
+
+
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  @apply bg-zinc-950 text-zinc-50;
+  @apply bg-zinc-50 text-zinc-900;
 }
